@@ -155,7 +155,7 @@ class ReportPortalHTTPService
             ]
         ]);
     }
-    
+
     /**
      * @param string $timeZone
      */
@@ -187,7 +187,7 @@ class ReportPortalHTTPService
     {
         self::$host = $host;
     }
-    
+
     /**
      * @param bool $isHTTPErrorsAllowed
      */
@@ -205,7 +205,7 @@ class ReportPortalHTTPService
     {
         return self::$rootItemID != self::EMPTY_ID;
     }
-    
+
     /**
      * @return string
      */
@@ -229,7 +229,7 @@ class ReportPortalHTTPService
     {
         self::$stepItemID = self::EMPTY_ID;
     }
-    
+
     /**
      * @param string $UUID
      * @param string $baseURI
@@ -247,7 +247,7 @@ class ReportPortalHTTPService
         self::$projectName = $projectName;
         self::$isHTTPErrorsAllowed = $isHTTPErrorsAllowed;
     }
-    
+
     /**
      * Check if any step has running status
      *
@@ -314,9 +314,9 @@ class ReportPortalHTTPService
                 'Content-Type' => 'application/json'
             ),
             'json' => array(
-                'description' => utf8_encode($description),
+                'description' => self::to_utf8($description),
                 'mode' => $mode,
-                'name' => utf8_encode($name),
+                'name' => self::to_utf8($name),
                 'start_time' => self::getTime(),
                 'tags' => $tags
             )
@@ -345,7 +345,7 @@ class ReportPortalHTTPService
         ));
         return $result;
     }
-    
+
     /**
      * Force finish test run
      *
@@ -366,7 +366,7 @@ class ReportPortalHTTPService
         ));
         return $result;
     }
-    
+
     /**
      * Create root item
      *
@@ -385,9 +385,9 @@ class ReportPortalHTTPService
                 'Content-Type' => 'application/json'
             ),
             'json' => array(
-                'description' => utf8_encode($description),
+                'description' => self::to_utf8($description),
                 'launch_id' => self::$launchID,
-                'name' => utf8_encode($name),
+                'name' => self::to_utf8($name),
                 'start_time' => self::getTime(),
                 "tags" => $tags,
                 "type" => "SUITE"
@@ -428,7 +428,7 @@ class ReportPortalHTTPService
             ),
             'json' => array(
                 'item_id' => $item_id,
-                'message' => utf8_encode($message),
+                'message' => self::to_utf8($message),
                 'time' => self::getTime(),
                 'level' => $logLevel
             )
@@ -455,7 +455,7 @@ class ReportPortalHTTPService
                     'name' => 'json_request_part',
                     'contents' => json_encode([['file' => ['name' => 'picture'],
                         'item_id' => $item_id,
-                        'message' => utf8_encode($message),
+                        'message' => self::to_utf8($message),
                         'time' => self::getTime(),
                         'level' => $logLevel]]),
                     'headers' => [
@@ -502,7 +502,7 @@ class ReportPortalHTTPService
                 'Content-Type' => 'application/json'
             ),
             'json' => array(
-                'description' => utf8_encode($description),
+                'description' => self::to_utf8($description),
                 'end_time' => self::getTime(),
                 'status' => $status
             )
@@ -546,9 +546,9 @@ class ReportPortalHTTPService
                 'Content-Type' => 'application/json'
             ),
             'json' => array(
-                'description' => utf8_encode($description),
+                'description' => self::to_utf8($description),
                 'launch_id' => self::$launchID,
-                'name' => utf8_encode($name),
+                'name' => self::to_utf8($name),
                 'start_time' => self::getTime(),
                 'tags' => $tags,
                 'type' => $type
@@ -591,5 +591,46 @@ class ReportPortalHTTPService
             self::forceFinishTestRun(ItemStatusesEnum::CANCELLED);
         }
         return $status;
+    }
+
+    /**
+     * https://stackoverflow.com/questions/1401317/remove-non-utf8-characters-from-string
+     * @var string
+     */
+    static $regex = <<<'END'
+/
+  (
+    (?: [\x00-\x7F]               # single-byte sequences   0xxxxxxx
+    |   [\xC0-\xDF][\x80-\xBF]    # double-byte sequences   110xxxxx 10xxxxxx
+    |   [\xE0-\xEF][\x80-\xBF]{2} # triple-byte sequences   1110xxxx 10xxxxxx * 2
+    |   [\xF0-\xF7][\x80-\xBF]{3} # quadruple-byte sequence 11110xxx 10xxxxxx * 3
+    ){1,100}                      # ...one or more times
+  )
+| ( [\x80-\xBF] )                 # invalid byte in range 10000000 - 10111111
+| ( [\xC0-\xFF] )                 # invalid byte in range 11000000 - 11111111
+/x
+END;
+
+    public static function utf8replacer($captures) {
+        if ($captures[1] != "") {
+            // Valid byte sequence. Return unmodified.
+            return $captures[1];
+        } elseif ($captures[2] != "") {
+            // Invalid byte of the form 10xxxxxx.
+            // Encode as 11000010 10xxxxxx.
+            return "\xC2".$captures[2];
+        } else {
+            // Invalid byte of the form 11xxxxxx.
+            // Encode as 11000011 10xxxxxx.
+            return "\xC3".chr(ord($captures[3])-64);
+        }
+    }
+
+    protected static function to_utf8($s) {
+        try {
+            return mb_convert_encoding($s, "UTF-8", "auto");
+        } catch (\Exception $e) {
+            return preg_replace_callback(self::$regex, [self::class,"utf8replacer"], $s);
+        }
     }
 }
