@@ -15,7 +15,7 @@
             "role" : "Developer"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require" : {
         "guzzlehttp/guzzle" : "*",
         "psr/http-message" : "*",
