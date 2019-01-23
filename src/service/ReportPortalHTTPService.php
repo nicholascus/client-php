@@ -159,7 +159,7 @@ class ReportPortalHTTPService
     /**
      * @param string $timeZone
      */
-    public static function setTimeZone(string $timeZone)
+    public static function setTimeZone($timeZone)
     {
         self::$timeZone = $timeZone;
     }
@@ -167,7 +167,7 @@ class ReportPortalHTTPService
     /**
      * @param string $UUID
      */
-    public static function setUUID(string $UUID)
+    public static function setUUID($UUID)
     {
         self::$UUID = $UUID;
     }
@@ -175,7 +175,7 @@ class ReportPortalHTTPService
     /**
      * @param string $baseURI
      */
-    public static function setBaseURI(string $baseURI)
+    public static function setBaseURI($baseURI)
     {
         self::$baseURI = $baseURI;
     }
@@ -183,7 +183,7 @@ class ReportPortalHTTPService
     /**
      * @param string $host
      */
-    public static function setHost(string $host)
+    public static function setHost($host)
     {
         self::$host = $host;
     }
@@ -191,7 +191,7 @@ class ReportPortalHTTPService
     /**
      * @param bool $isHTTPErrorsAllowed
      */
-    public static function setIsHTTPErrorsAllowed(bool $isHTTPErrorsAllowed)
+    public static function setIsHTTPErrorsAllowed($isHTTPErrorsAllowed)
     {
         self::$isHTTPErrorsAllowed = $isHTTPErrorsAllowed;
     }
@@ -209,7 +209,7 @@ class ReportPortalHTTPService
     /**
      * @return string
      */
-    public static function getStepItemID(): string
+    public static function getStepItemID()
     {
         return self::$stepItemID;
     }
@@ -217,7 +217,7 @@ class ReportPortalHTTPService
     /**
      * @param string $stepItemID
      */
-    public static function setStepItemID(string $stepItemID)
+    public static function setStepItemID($stepItemID)
     {
         self::$stepItemID = $stepItemID;
     }
@@ -238,7 +238,7 @@ class ReportPortalHTTPService
      * @param string $projectName
      * @param bool $isHTTPErrorsAllowed
      */
-    public static function configureClient(string $UUID, string $baseURI, string $host, string $timeZone, string $projectName, bool $isHTTPErrorsAllowed)
+    public static function configureClient($UUID, $baseURI, $host, $timeZone, $projectName, $isHTTPErrorsAllowed)
     {
         self::$UUID = $UUID;
         self::$baseURI = $baseURI;
@@ -284,7 +284,7 @@ class ReportPortalHTTPService
      * @param string $yamlFilePath
      *            - path to configuration file
      */
-    public static function configureReportPortalHTTPService(string $yamlFilePath)
+    public static function configureReportPortalHTTPService($yamlFilePath)
     {
         $yamlArray = Yaml::parse($yamlFilePath);
         self::$UUID = $yamlArray['UUID'];
@@ -307,7 +307,7 @@ class ReportPortalHTTPService
      *            - array with tags of test run
      * @return ResponseInterface - result of request
      */
-    public static function launchTestRun(string $name, string $description, string $mode, array $tags)
+    public static function launchTestRun($name, $description, $mode, $tags)
     {
         $result = self::$client->post('v1/' . self::$projectName . '/launch', array(
             'headers' => array(
@@ -332,7 +332,7 @@ class ReportPortalHTTPService
      *            - status of test run
      * @return ResponseInterface - result of request
      */
-    public static function finishTestRun(string $runStatus)
+    public static function finishTestRun($runStatus)
     {
         $result = self::$client->put('v1/' . self::$projectName . '/launch/' . self::$launchID . '/finish', array(
             'headers' => array(
@@ -353,7 +353,7 @@ class ReportPortalHTTPService
      *            - status of test run
      * @return ResponseInterface - result of request
      */
-    public static function forceFinishTestRun( string $runStatus)
+    public static function forceFinishTestRun($runStatus)
     {
         $result = self::$client->put('v1/' . self::$projectName . '/launch/' . self::$launchID . '/stop', array(
             'headers' => array(
@@ -378,7 +378,7 @@ class ReportPortalHTTPService
      *            - array with tags
      * @return ResponseInterface - result of request
      */
-    public static function createRootItem(string $name, string $description, array $tags)
+    public static function createRootItem($name, $description, $tags)
     {
         $result = self::$client->post('v1/' . self::$projectName . '/item', array(
             'headers' => array(
@@ -420,7 +420,7 @@ class ReportPortalHTTPService
      *            - log level of log message
      * @return ResponseInterface - result of request
      */
-    public static function addLogMessage(string $item_id, string $message, string $logLevel)
+    public static function addLogMessage($item_id, $message, $logLevel)
     {
         $result = self::$client->post('v1/' . self::$projectName . '/log', array(
             'headers' => array(
@@ -447,7 +447,7 @@ class ReportPortalHTTPService
      *
      * @return ResponseInterface - response
      */
-    public static function addLogMessageWithPicture(string $item_id, string $message, string $logLevel, string $pictureAsString, string $pictureContentType)
+    public static function addLogMessageWithPicture($item_id, $message, $logLevel, $pictureAsString, $pictureContentType)
     {
         if (self::isStepRunned()) {
             $multipart = new MultipartStream([
@@ -495,7 +495,7 @@ class ReportPortalHTTPService
      *            - description of test item
      * @return ResponseInterface - result of request
      */
-    public static function finishItem(string $itemID, string $status, string $description)
+    public static function finishItem($itemID, $status, $description)
     {
         $result = self::$client->put('v1/' . self::$projectName . '/item/' . $itemID, array(
             'headers' => array(
@@ -518,7 +518,7 @@ class ReportPortalHTTPService
      * @param ResponseInterface $response
      * @return string value by $lookForRequest.
      */
-    public static function getValueFromResponse(string $lookForRequest, ResponseInterface $response)
+    public static function getValueFromResponse($lookForRequest, $response)
     {
         $array = json_decode($response->getBody()->getContents());
         return $array->{$lookForRequest};
@@ -539,7 +539,7 @@ class ReportPortalHTTPService
      *            - array with tags
      * @return ResponseInterface - result of request
      */
-    public static function startChildItem(string $parentItemID, string $description, string $name, string $type, array $tags)
+    public static function startChildItem($parentItemID, $description, $name, $type, $tags)
     {
         $result = self::$client->post('v1/' . self::$projectName . '/item/' . $parentItemID, array(
             'headers' => array(
