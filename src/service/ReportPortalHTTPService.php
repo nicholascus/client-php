@@ -314,9 +314,9 @@ class ReportPortalHTTPService
                 'Content-Type' => 'application/json'
             ),
             'json' => array(
-                'description' => $description,
+                'description' => utf8_encode($description),
                 'mode' => $mode,
-                'name' => $name,
+                'name' => utf8_encode($name),
                 'start_time' => self::getTime(),
                 'tags' => $tags
             )
@@ -385,9 +385,9 @@ class ReportPortalHTTPService
                 'Content-Type' => 'application/json'
             ),
             'json' => array(
-                'description' => $description,
+                'description' => utf8_encode($description),
                 'launch_id' => self::$launchID,
-                'name' => $name,
+                'name' => utf8_encode($name),
                 'start_time' => self::getTime(),
                 "tags" => $tags,
                 "type" => "SUITE"
@@ -428,7 +428,7 @@ class ReportPortalHTTPService
             ),
             'json' => array(
                 'item_id' => $item_id,
-                'message' => $message,
+                'message' => utf8_encode($message),
                 'time' => self::getTime(),
                 'level' => $logLevel
             )
@@ -455,7 +455,7 @@ class ReportPortalHTTPService
                     'name' => 'json_request_part',
                     'contents' => json_encode([['file' => ['name' => 'picture'],
                         'item_id' => $item_id,
-                        'message' => $message,
+                        'message' => utf8_encode($message),
                         'time' => self::getTime(),
                         'level' => $logLevel]]),
                     'headers' => [
@@ -502,7 +502,7 @@ class ReportPortalHTTPService
                 'Content-Type' => 'application/json'
             ),
             'json' => array(
-                'description' => $description,
+                'description' => utf8_encode($description),
                 'end_time' => self::getTime(),
                 'status' => $status
             )
@@ -546,9 +546,9 @@ class ReportPortalHTTPService
                 'Content-Type' => 'application/json'
             ),
             'json' => array(
-                'description' => $description,
+                'description' => utf8_encode($description),
                 'launch_id' => self::$launchID,
-                'name' => $name,
+                'name' => utf8_encode($name),
                 'start_time' => self::getTime(),
                 'tags' => $tags,
                 'type' => $type
